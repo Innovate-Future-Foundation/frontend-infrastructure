@@ -10,9 +10,9 @@ variable "environment" {
   default     = "dev"
 }
 
-variable "domain_name" {
+variable "bucket_name" {
   type        = string
-  description = "Domain name for the frontend application"
+  description = "Name of the S3 bucket for frontend static files"
 }
 
 variable "domain_name" {
