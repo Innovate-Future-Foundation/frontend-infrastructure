@@ -4,8 +4,14 @@ data "aws_iam_policy_document" "frontend_s3_policy" {
     resources = ["${aws_s3_bucket.frontend.arn}/*"]
 
     principals {
-      type        = "AWS"
-      identifiers = [var.cloudfront_oai_arn]
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+    
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [var.cloudfront_distribution_arn]
     }
   }
 }

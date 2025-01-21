@@ -7,7 +7,7 @@ module "s3" {
   
   bucket_name        = local.bucket_name
   environment        = var.environment
-  cloudfront_oai_arn = module.cloudfront.cloudfront_oai_arn
+  cloudfront_distribution_arn = module.cloudfront.distribution_arn 
 }
 
 module "cloudfront" {
@@ -17,6 +17,7 @@ module "cloudfront" {
   bucket_domain_name  = module.s3.bucket_domain_name
   bucket_arn          = module.s3.bucket_arn
   acm_certificate_arn = module.route53_acm.certificate_arn
+  environment         = var.environment
 }
 
 module "route53_acm" {

@@ -8,7 +8,7 @@ variable "environment" {
   description = "Environment name"
 }
 
-variable "cloudfront_oai_arn" {
+variable "cloudfront_distribution_arn" {
   type        = string
-  description = "CloudFront Origin Access Identity ARN"
+  description = "The ARN of the CloudFront distribution"
 }

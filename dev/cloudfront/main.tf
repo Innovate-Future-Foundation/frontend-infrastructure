@@ -1,5 +1,15 @@
-resource "aws_cloudfront_origin_access_identity" "frontend" {
-  comment = "OAI for frontend static website"
+# 获取 AWS 托管的缓存策略
+data "aws_cloudfront_cache_policy" "optimized" {
+  name = "Managed-CachingOptimized"
+}
+
+# 创建 Origin Access Control
+resource "aws_cloudfront_origin_access_control" "frontend" {
+  name                              = "${var.domain_name}-oac"
+  description                       = "Origin Access Control for frontend static website"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 resource "aws_cloudfront_distribution" "frontend" {
@@ -9,12 +19,9 @@ resource "aws_cloudfront_distribution" "frontend" {
   price_class         = "PriceClass_All"
 
   origin {
-    domain_name = var.bucket_domain_name
-    origin_id   = local.s3_origin_id
-
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.frontend.cloudfront_access_identity_path
-    }
+    domain_name              = var.bucket_domain_name
+    origin_id                = local.s3_origin_id
+    origin_access_control_id = aws_cloudfront_origin_access_control.frontend.id
   }
 
   default_cache_behavior {
@@ -22,17 +29,9 @@ resource "aws_cloudfront_distribution" "frontend" {
     cached_methods         = ["GET", "HEAD"]
     target_origin_id       = local.s3_origin_id
     viewer_protocol_policy = "redirect-to-https"
-
-    forwarded_values {
-      query_string = false
-      cookies {
-        forward = "none"
-      }
-    }
-
-    min_ttl     = 0
-    default_ttl = 3600
-    max_ttl     = 86400
+    
+    cache_policy_id = data.aws_cloudfront_cache_policy.optimized.id
+    compress        = true
   }
 
   viewer_certificate {
@@ -59,6 +58,11 @@ resource "aws_cloudfront_distribution" "frontend" {
     error_code         = 404
     response_code      = 200
     response_page_path = "/index.html"
+  }
+
+  tags = {
+    Name        = "${var.domain_name}-distribution"
+    Environment = var.environment
   }
 }
 
