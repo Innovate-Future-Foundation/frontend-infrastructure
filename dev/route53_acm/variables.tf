@@ -12,3 +12,8 @@ variable "cloudfront_zone_id" {
   type        = string
   description = "CloudFront distribution hosted zone ID"
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "Resource tags"
+}

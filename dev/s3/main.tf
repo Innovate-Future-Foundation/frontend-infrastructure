@@ -1,5 +1,13 @@
 resource "aws_s3_bucket" "frontend" {
   bucket = var.bucket_name
+
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.bucket_name}-frontend-bucket"
+      Service = "Static Website Hosting"
+    }
+  )
 }
 
 resource "aws_s3_bucket_public_access_block" "frontend" {

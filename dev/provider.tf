@@ -11,12 +11,8 @@ provider "aws" {
   region = var.region
 
   default_tags {
-    tags = {
-      Environment = "Development"
-      ManagedBy   = "Terraform"
-      Project     = "Frontend"
-    }
-  }
+  tags = var.tags
+}
 }
 
 provider "aws" {

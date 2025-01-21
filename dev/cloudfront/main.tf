@@ -58,10 +58,13 @@ resource "aws_cloudfront_distribution" "frontend" {
     response_page_path = "/index.html"
   }
 
-  tags = {
-    Name        = "${var.domain_name}-distribution"
-    Environment = var.environment
-  }
+  tags = merge(
+    var.tags,
+    {
+      Name = "${var.domain_name}-distribution"
+      Service = "Content Delivery"
+    }
+)
 }
 
 locals {

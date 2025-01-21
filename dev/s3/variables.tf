@@ -12,3 +12,8 @@ variable "cloudfront_distribution_arn" {
   type        = string
   description = "The ARN of the CloudFront distribution"
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "Resource tags"
+}

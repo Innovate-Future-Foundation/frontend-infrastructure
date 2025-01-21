@@ -8,6 +8,13 @@ resource "aws_acm_certificate" "frontend" {
   domain_name       = var.domain_name
   validation_method = "DNS"
 
+  tags = merge(
+    var.tags,
+    {
+      Name    = "${var.domain_name}-certificate"
+      Service = "SSL Certificate"
+    }
+  )
   lifecycle {
     create_before_destroy = true
   }

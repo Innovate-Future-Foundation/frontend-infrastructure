@@ -23,3 +23,14 @@ variable "domain_name" {
     error_message = "Domain name must be a valid domain name."
   }
 }
+
+variable "tags" {
+  type        = map(string)
+  description = "Common tags for all resources"
+  default = {
+    Environment = "dev"
+    ManagedBy   = "Terraform"
+    Project     = "IFF"
+    Owner       = "IFA"
+  }
+}
