@@ -3,12 +3,12 @@ name: 'Terraform Apply'
 on:
   push:
     branches:
-      - main
+      - dev
     paths:
       - 'dev/**'
   pull_request:
     branches:
-      - main
+      - dev
     paths:
       - 'dev/**'
 
