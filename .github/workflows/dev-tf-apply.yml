@@ -21,7 +21,6 @@ jobs:
   dev_frontend_terraform_apply:
     name: 'Terraform'
     runs-on: ubuntu-22.04
-    environment: Development
     
     defaults:
       run:
@@ -36,7 +35,7 @@ jobs:
       with:
         role-to-assume: arn:aws:iam::${{ secrets.AWS_DEV_ACCOUNT }}:role/oidc-inff-frontend-infrastructure
         aws-region: ap-southeast-2
-        audience: sts.amazonaws.com
+        # audience: sts.amazonaws.com
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
