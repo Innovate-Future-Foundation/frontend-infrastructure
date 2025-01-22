@@ -2,6 +2,10 @@ data "aws_cloudfront_cache_policy" "optimized" {
   name = "Managed-CachingOptimized"
 }
 
+data "aws_cloudfront_response_headers_policy" "security_headers" {
+  name = "Managed-SecurityHeadersPolicy"
+}
+
 resource "aws_cloudfront_origin_access_control" "frontend" {
   name                              = "${var.domain_name}-oac"
   description                       = "Origin Access Control for frontend static website"
@@ -23,13 +27,13 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   default_cache_behavior {
-    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
-    cached_methods         = ["GET", "HEAD"]
-    target_origin_id       = local.s3_origin_id
-    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods            = ["GET", "HEAD", "OPTIONS"]
+    cached_methods             = ["GET", "HEAD"]
+    target_origin_id           = local.s3_origin_id
+    viewer_protocol_policy     = "redirect-to-https"
     response_headers_policy_id = data.aws_cloudfront_response_headers_policy.security_headers.id
-    cache_policy_id = data.aws_cloudfront_cache_policy.optimized.id
-    compress        = true
+    cache_policy_id            = data.aws_cloudfront_cache_policy.optimized.id
+    compress                   = true
   }
 
   viewer_certificate {
@@ -61,10 +65,10 @@ resource "aws_cloudfront_distribution" "frontend" {
   tags = merge(
     var.tags,
     {
-      Name = "${var.domain_name}-distribution"
+      Name    = "${var.domain_name}-distribution"
       Service = "Content Delivery"
     }
-)
+  )
 }
 
 locals {

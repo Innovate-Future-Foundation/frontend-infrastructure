@@ -7,7 +7,7 @@ data "aws_iam_policy_document" "frontend_s3_policy" {
       type        = "Service"
       identifiers = ["cloudfront.amazonaws.com"]
     }
-    
+
     condition {
       test     = "StringEquals"
       variable = "AWS:SourceArn"

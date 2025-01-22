@@ -4,7 +4,7 @@ resource "aws_s3_bucket" "frontend" {
   tags = merge(
     var.tags,
     {
-      Name = "${var.bucket_name}-frontend-bucket"
+      Name    = "${var.bucket_name}-frontend-bucket"
       Service = "Static Website Hosting"
     }
   )
