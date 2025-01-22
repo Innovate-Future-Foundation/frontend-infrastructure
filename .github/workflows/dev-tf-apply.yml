@@ -1,4 +1,4 @@
-name: 'Terraform Apply'
+name: 'Frontend Terraform Apply'
 
 on:
   push:
