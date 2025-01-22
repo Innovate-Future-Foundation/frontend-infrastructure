@@ -1,4 +1,4 @@
-name: 'Frontend Terraform Apply'
+name: 'Dev - Frontend Terraform Apply'
 
 on:
   push:
@@ -18,9 +18,9 @@ permissions:
   pull-requests: write
 
 jobs:
-  terraform:
+  dev_frontend_terraform_apply:
     name: 'Terraform'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     
     defaults:
       run:
