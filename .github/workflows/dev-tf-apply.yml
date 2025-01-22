@@ -21,6 +21,7 @@ jobs:
   dev_frontend_terraform_apply:
     name: 'Terraform'
     runs-on: ubuntu-22.04
+    environment: Development
     
     defaults:
       run:
