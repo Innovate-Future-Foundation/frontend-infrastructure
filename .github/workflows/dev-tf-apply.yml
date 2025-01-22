@@ -17,10 +17,15 @@ permissions:
   contents: read
   pull-requests: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-22.04
+    timeout-minutes: 30
     environment: Development
     
     defaults:
@@ -50,8 +55,61 @@ jobs:
       run: terraform init
 
     - name: Terraform Plan
-      run: terraform plan -no-color -out=tfplan
+      id: plan
+      run: |
+        if ! terraform plan -no-color -out=tfplan; then
+          LOCK_ID=$(terraform show -json .terraform.lock.hcl 2>/dev/null | jq -r '.Id' || echo "")
+          if [ ! -z "$LOCK_ID" ]; then
+            echo "Found stale lock, waiting for 60 seconds and retrying..."
+            sleep 60
+            terraform plan -no-color -out=tfplan
+          else
+            echo "::error::Terraform plan failed for reasons other than locking"
+            exit 1
+          fi
+        fi
+
+    - name: Post Plan to PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const output = require('fs').readFileSync('dev/tfplan', 'utf8');
+          const comment = `### Terraform Plan Output\n\`\`\`hcl\n${output}\n\`\`\``;
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
       
     - name: Terraform Apply
       if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
-      run: terraform apply -auto-approve tfplan
+      run: |
+        if ! terraform apply -auto-approve tfplan; then
+          echo "::error::Terraform apply failed"
+          exit 1
+        fi
+
+    - name: Notify on Failure
+      if: failure()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const message = `❌ Terraform operation failed in ${process.env.GITHUB_WORKFLOW}
+          
+          Workflow: [View Run](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})`;
+          
+          if (context.issue.number) {
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });
+          }
+
+    - name: Cleanup
+      if: always()
+      run: |
+        rm -f tfplan || true
