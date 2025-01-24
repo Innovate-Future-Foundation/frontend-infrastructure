@@ -20,7 +20,8 @@
         "s3:GetBucketPublicAccessBlock",
         "s3:PutEncryptionConfiguration",
         "s3:GetEncryptionConfiguration",
-        "s3:GetBucketAccelerateConfiguration"
+        "s3:GetBucketAccelerateConfiguration",
+        "s3:PutBucketAccelerateConfiguration"
       ],
       "Resource": [
         "arn:aws:s3:::*",
@@ -112,6 +113,5 @@
       ],
       "Resource": "*"
     }
-
   ]
 }
