@@ -44,6 +44,7 @@ jobs:
         env:
           aws_tfstate_key: 'state/terraform-state'
         with:
+          aws-region: ${{ secrets.AWS_REGION }}
           terraform_dir: ${{ env.tf_dir }}
           terraform_version: ${{ env.tf_version }}
           aws_region: ${{ secrets.TF_BACKEND_REGION }}
