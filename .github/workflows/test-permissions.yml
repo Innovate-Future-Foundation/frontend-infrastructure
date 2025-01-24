@@ -4,9 +4,11 @@ on:
 
   push:
     branches:
-      - "test/permissions"
+      - dev
     paths:
       - "dev/**"
+      - '.github/workflows/test-permissions.yml'
+
 
 jobs:
   test_permissions:
