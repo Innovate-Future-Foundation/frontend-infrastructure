@@ -7,8 +7,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5.0"
       
       - name: Run terraform with error logging
         run: |
@@ -16,8 +19,7 @@ jobs:
           terraform init 2> tf_errors.log || true
           terraform plan 2>> tf_errors.log || true
       
-      - name: Upload error logs
-        uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v3
         with:
           name: terraform-errors
           path: dev/tf_errors.log
