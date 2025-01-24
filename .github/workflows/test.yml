@@ -1,4 +1,3 @@
-# .github/workflows/test-permissions.yml
 name: Test AWS Permissions
 
 on: 
@@ -27,10 +26,12 @@ jobs:
           aws s3api get-bucket-acceleration --bucket dev-foundation-innovatefuture-dev-frontend-static || echo "Missing s3:GetBucketAccelerateConfiguration"
           aws s3api get-bucket-website --bucket dev-foundation-innovatefuture-dev-frontend-static || echo "Missing s3:GetBucketWebsite"
           aws s3api get-bucket-versioning --bucket dev-foundation-innovatefuture-dev-frontend-static || echo "Missing s3:GetBucketVersioning"
+          aws s3api get-bucket-policy --bucket dev-foundation-innovatefuture-dev-frontend-static || echo "Missing s3:GetBucketPolicy"  # 新增
           
           echo "=== Testing S3 State Bucket Access ==="
-          aws s3api head-object --bucket inff-frontend-infrastructure-tfstate-melj2 --key dev/terraform.tfstate || echo "Missing state file access"
-          aws s3api get-bucket-encryption --bucket inff-frontend-infrastructure-tfstate-melj2 || echo "Missing s3:GetBucketEncryption"
+          aws s3api head-object --bucket inff-frontend-infrastructure-tfstate-melj2 --key dev/terraform.tfstate || echo "Missing s3:GetObject"
+          aws s3api get-bucket-encryption --bucket inff-frontend-infrastructure-tfstate-melj2 || echo "Missing s3:GetEncryptionConfiguration"
+          aws s3api list-buckets || echo "Missing s3:ListAllMyBuckets"  # 新增通用权限测试
 
       - name: Test CloudFront Permissions
         run: |
@@ -38,6 +39,7 @@ jobs:
           aws cloudfront list-cache-policies || echo "Missing cloudfront:ListCachePolicies"
           aws cloudfront list-response-headers-policies || echo "Missing cloudfront:ListResponseHeadersPolicies"
           aws cloudfront list-distributions || echo "Missing cloudfront:ListDistributions"
+          aws cloudfront get-distribution-config --id $(aws cloudfront list-distributions --query 'DistributionList.Items[0].Id' --output text) || echo "Missing cloudfront:GetDistributionConfig"  # 新增
 
       - name: Test Route53 Permissions
         run: |
@@ -45,18 +47,29 @@ jobs:
           aws route53 list-hosted-zones || echo "Missing route53:ListHostedZones"
           aws route53 list-resource-record-sets --hosted-zone-id Z0802797114DVNCGZ0O39 || echo "Missing route53:ListResourceRecordSets"
           aws route53 list-tags-for-resource --resource-type hostedzone --resource-id Z0802797114DVNCGZ0O39 || echo "Missing route53:ListTagsForResource"
+          aws route53 get-hosted-zone --id Z0802797114DVNCGZ0O39 || echo "Missing route53:GetHostedZone"  # 新增
 
       - name: Test ACM Permissions
         run: |
           echo "=== Testing ACM Permissions ==="
-          aws acm list-certificates --region us-east-1 || echo "Missing acm:ListCertificates"  # 添加 --region us-east-1
-          # Get first certificate ARN
+          aws acm list-certificates --region us-east-1 || echo "Missing acm:ListCertificates"
           CERT_ARN=$(aws acm list-certificates --region us-east-1 --query 'CertificateSummaryList[0].CertificateArn' --output text)
           if [ "$CERT_ARN" != "None" ]; then
+            aws acm describe-certificate --certificate-arn $CERT_ARN --region us-east-1 || echo "Missing acm:DescribeCertificate"  # 新增
             aws acm list-tags-for-certificate --certificate-arn $CERT_ARN --region us-east-1 || echo "Missing acm:ListTagsForCertificate"
+          else
+            echo "No ACM certificates found, skipping detailed checks"
           fi
 
       - name: Test DynamoDB Permissions
         run: |
           echo "=== Testing DynamoDB Permissions ==="
           aws dynamodb describe-table --table-name inff-frontend-infrastructure-tflock || echo "Missing dynamodb:DescribeTable"
+          aws dynamodb get-item --table-name inff-frontend-infrastructure-tflock --key '{"LockID": {"S": "test"}}' || echo "Missing dynamodb:GetItem"  # 新增
+          aws dynamodb scan --table-name inff-frontend-infrastructure-tflock || echo "Missing dynamodb:Scan"  # 新增
+
+      - name: Test IAM Basic Permissions  # 新增基础IAM权限测试
+        run: |
+          echo "=== Testing IAM Basic Permissions ==="
+          aws iam get-role --role-name oidc-inff-frontend-infrastructure || echo "Missing iam:GetRole"
+          aws sts get-caller-identity || echo "Missing sts:GetCallerIdentity"
