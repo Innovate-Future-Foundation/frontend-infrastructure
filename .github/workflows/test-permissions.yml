@@ -1,62 +1,17 @@
-# .github/workflows/test-permissions.yml
-name: Test AWS Permissions
-
-on: 
-  workflow_dispatch:  # 手动触发
-
-permissions:
-  id-token: write
-  contents: read
+name: Test IAM Permissions
+on: workflow_dispatch
 
 jobs:
   test_permissions:
-    name: 'Test AWS Permissions'
-    runs-on: ubuntu-22.04
-    environment: Development
-
+    runs-on: ubuntu-latest
     steps:
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+      - uses: actions/checkout@v4
+      - run: |
+          cd dev
+          terraform init 2> error.log || true
+          terraform plan 2>> error.log || true
+          grep "operation error" error.log | awk -F "action" '{print $2}' | sort -u > ../missing-permissions.txt
+      - uses: actions/upload-artifact@v3
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_DEV_ACCOUNT }}:role/oidc-inff-frontend-infrastructure
-          aws-region: ap-southeast-2
-
-      - name: Test S3 Bucket Permissions
-        run: |
-          echo "=== Testing S3 Basic Permissions ==="
-          aws s3api get-bucket-acceleration --bucket dev-foundation-innovatefuture-dev-frontend-static || echo "Missing s3:GetBucketAccelerateConfiguration"
-          aws s3api get-bucket-website --bucket dev-foundation-innovatefuture-dev-frontend-static || echo "Missing s3:GetBucketWebsite"
-          aws s3api get-bucket-versioning --bucket dev-foundation-innovatefuture-dev-frontend-static || echo "Missing s3:GetBucketVersioning"
-          
-          echo "=== Testing S3 State Bucket Access ==="
-          aws s3api head-object --bucket inff-frontend-infrastructure-tfstate-melj2 --key dev/terraform.tfstate || echo "Missing state file access"
-          aws s3api get-bucket-encryption --bucket inff-frontend-infrastructure-tfstate-melj2 || echo "Missing s3:GetBucketEncryption"
-
-      - name: Test CloudFront Permissions
-        run: |
-          echo "=== Testing CloudFront Permissions ==="
-          aws cloudfront list-cache-policies || echo "Missing cloudfront:ListCachePolicies"
-          aws cloudfront list-response-headers-policies || echo "Missing cloudfront:ListResponseHeadersPolicies"
-          aws cloudfront list-distributions || echo "Missing cloudfront:ListDistributions"
-
-      - name: Test Route53 Permissions
-        run: |
-          echo "=== Testing Route53 Permissions ==="
-          aws route53 list-hosted-zones || echo "Missing route53:ListHostedZones"
-          aws route53 list-resource-record-sets --hosted-zone-id Z0802797114DVNCGZ0O39 || echo "Missing route53:ListResourceRecordSets"
-          aws route53 list-tags-for-resource --resource-type hostedzone --resource-id Z0802797114DVNCGZ0O39 || echo "Missing route53:ListTagsForResource"
-
-      - name: Test ACM Permissions
-        run: |
-          echo "=== Testing ACM Permissions ==="
-          aws acm list-certificates --region us-east-1 || echo "Missing acm:ListCertificates"  # 添加 --region us-east-1
-          # Get first certificate ARN
-          CERT_ARN=$(aws acm list-certificates --region us-east-1 --query 'CertificateSummaryList[0].CertificateArn' --output text)
-          if [ "$CERT_ARN" != "None" ]; then
-            aws acm list-tags-for-certificate --certificate-arn $CERT_ARN --region us-east-1 || echo "Missing acm:ListTagsForCertificate"
-          fi
-
-      - name: Test DynamoDB Permissions
-        run: |
-          echo "=== Testing DynamoDB Permissions ==="
-          aws dynamodb describe-table --table-name inff-frontend-infrastructure-tflock || echo "Missing dynamodb:DescribeTable"
+          name: missing-permissions
+          path: missing-permissions.txt
