@@ -54,7 +54,7 @@ jobs:
           # aws_region: ${{ secrets.TF_BACKEND_REGION }}
           aws_role_arn: 'arn:aws:iam::${{ secrets.AWS_DEV_ACCOUNT }}:role/oidc-${{ vars.REPO_ORG_ABBR }}-${{ github.event.repository.name }}'
           aws_tfstate_bucket: ${{ secrets.TF_BACKEND_STATE_BUCKET }}
-          aws_tfstate_key: ${{ env.aws_tfstate_key }}
+          aws_tfstate_key: "dev/terraform.tfstate"
           aws_tflock_table: ${{ secrets.TF_BACKEND_LOCKID_TABLE }}
 
       - id: tf_plan
