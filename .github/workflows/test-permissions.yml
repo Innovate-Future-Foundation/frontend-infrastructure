@@ -1,5 +1,7 @@
 name: Test IAM Permissions
 on: 
+  workflow_dispatch:   # 手动触发
+
   push:
     branches:
       - "test/permissions"
@@ -25,4 +27,3 @@ jobs:
         with:
           name: missing-permissions
           path: missing-permissions.txt
-          
