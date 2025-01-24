@@ -49,11 +49,11 @@ jobs:
       - name: Test ACM Permissions
         run: |
           echo "=== Testing ACM Permissions ==="
-          aws acm list-certificates || echo "Missing acm:ListCertificates"
+          aws acm list-certificates --region us-east-1 || echo "Missing acm:ListCertificates"  # 添加 --region us-east-1
           # Get first certificate ARN
-          CERT_ARN=$(aws acm list-certificates --query 'CertificateSummaryList[0].CertificateArn' --output text)
+          CERT_ARN=$(aws acm list-certificates --region us-east-1 --query 'CertificateSummaryList[0].CertificateArn' --output text)
           if [ "$CERT_ARN" != "None" ]; then
-            aws acm list-tags-for-certificate --certificate-arn $CERT_ARN || echo "Missing acm:ListTagsForCertificate"
+            aws acm list-tags-for-certificate --certificate-arn $CERT_ARN --region us-east-1 || echo "Missing acm:ListTagsForCertificate"
           fi
 
       - name: Test DynamoDB Permissions
