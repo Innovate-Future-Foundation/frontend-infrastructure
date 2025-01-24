@@ -14,7 +14,7 @@ on:
         type: number
 
 permissions:
-  id-token: write # This is required for requesting the JWT (OIDC) 
+  id-token: write # This is required for requesting the JWT (OIDC)
   contents: read
   pull-requests: write
 
