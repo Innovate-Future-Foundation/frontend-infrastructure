@@ -22,7 +22,10 @@
         "s3:GetEncryptionConfiguration",
         "s3:GetBucketAccelerateConfiguration"
       ],
-      "Resource": "arn:aws:s3:::*"
+      "Resource": [
+        "arn:aws:s3:::*",
+        "arn:aws:s3:::inff-frontend-infrastructure-tfstate-melj2"
+      ]
     },
     {
       "Effect": "Allow",
@@ -33,7 +36,10 @@
         "s3:ListBucketMultipartUploads",
         "s3:ListMultipartUploadParts"
       ],
-      "Resource": "arn:aws:s3:::*/*"
+      "Resource": [
+        "arn:aws:s3:::*/*",
+        "arn:aws:s3:::inff-frontend-infrastructure-tfstate-melj2/*"
+      ]
     },
     {
       "Effect": "Allow",
@@ -87,6 +93,25 @@
         "acm:ListTagsForCertificate"
       ],
       "Resource": "arn:aws:acm:*:*:certificate/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:DeleteItem"
+      ],
+      "Resource": "arn:aws:dynamodb:ap-southeast-2:376129846478:table/inff-frontend-infrastructure-tflock"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kms:Decrypt",
+        "kms:GenerateDataKey"
+      ],
+      "Resource": "*"
     }
+
   ]
 }
