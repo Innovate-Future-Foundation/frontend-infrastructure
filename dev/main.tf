@@ -20,7 +20,10 @@ module "cloudfront" {
   bucket_arn          = module.s3.bucket_arn
   acm_certificate_arn = module.route53_acm.certificate_arn
   environment         = var.environment
-  tags                = var.tags
+  agw_id              = var.agw_id
+  agw_region          = var.region
+
+  tags = var.tags
 }
 
 module "route53_acm" {

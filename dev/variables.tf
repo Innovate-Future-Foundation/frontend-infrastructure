@@ -34,3 +34,8 @@ variable "tags" {
     Owner       = "IFA"
   }
 }
+
+variable "agw_id" {
+  type        = string
+  description = "The Backend API Gateway id"
+}
