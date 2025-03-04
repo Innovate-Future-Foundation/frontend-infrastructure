@@ -37,10 +37,9 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   viewer_certificate {
-    acm_certificate_arn      = var.use_acm_certificate ? var.acm_certificate_arn : null
-    ssl_support_method       = var.use_acm_certificate ? "sni-only" : null
-    minimum_protocol_version = var.use_acm_certificate ? "TLSv1.2_2021" : "TLSv1"
-    cloudfront_default_certificate = var.use_acm_certificate ? false : true
+    acm_certificate_arn      = var.acm_certificate_arn
+    ssl_support_method       = "sni-only"
+    minimum_protocol_version = "TLSv1.2_2021"
   }
 
   restrictions {
@@ -49,7 +48,7 @@ resource "aws_cloudfront_distribution" "frontend" {
     }
   }
 
-  aliases = var.use_acm_certificate ? [var.domain_name] : []
+  aliases = [var.domain_name]
 
   custom_error_response {
     error_code         = 403
