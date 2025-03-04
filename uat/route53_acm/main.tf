@@ -1,5 +1,4 @@
 data "aws_route53_zone" "domain" {
-  count        = var.create_route53_records ? 1 : 0
   name         = var.domain_name
   private_zone = false
 }
@@ -21,29 +20,30 @@ resource "aws_acm_certificate" "frontend" {
   }
 }
 
-locals {
-  domain_validation_options = var.create_route53_records ? aws_acm_certificate.frontend.domain_validation_options : []
-}
-
 resource "aws_route53_record" "acm_validation" {
-  count   = var.create_route53_records ? length(local.domain_validation_options) : 0
-  zone_id = data.aws_route53_zone.domain[0].zone_id
-  name    = element(local.domain_validation_options, count.index).resource_record_name
-  type    = element(local.domain_validation_options, count.index).resource_record_type
-  records = [element(local.domain_validation_options, count.index).resource_record_value]
+  for_each = {
+    for dvo in aws_acm_certificate.frontend.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
+
+  zone_id = data.aws_route53_zone.domain.zone_id
+  name    = each.value.name
+  type    = each.value.type
+  records = [each.value.record]
   ttl     = 60
 }
 
 resource "aws_acm_certificate_validation" "frontend" {
-  count                   = var.create_route53_records ? 1 : 0
   provider                = aws.us-east-1
   certificate_arn         = aws_acm_certificate.frontend.arn
-  validation_record_fqdns = var.create_route53_records ? aws_route53_record.acm_validation[*].fqdn : []
+  validation_record_fqdns = [for record in aws_route53_record.acm_validation : record.fqdn]
 }
 
 resource "aws_route53_record" "frontend" {
-  count   = var.create_route53_records ? 1 : 0
-  zone_id = data.aws_route53_zone.domain[0].zone_id
+  zone_id = data.aws_route53_zone.domain.zone_id
   name    = var.domain_name
   type    = "A"
 
