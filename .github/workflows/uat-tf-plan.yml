@@ -3,7 +3,7 @@ name: UAT - Terraform Plan
 on:
   pull_request:
     branches:
-      - uat
+      - dev
     paths:
       - "uat/**"
       - ".github/workflows/uat-tf-plan.yml"
