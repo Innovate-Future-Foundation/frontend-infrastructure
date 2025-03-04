@@ -17,9 +17,3 @@ variable "tags" {
   type        = map(string)
   description = "Resource tags"
 }
-
-variable "create_route53_records" {
-  description = "Whether to create Route 53 records"
-  type        = bool
-  default     = true
-}

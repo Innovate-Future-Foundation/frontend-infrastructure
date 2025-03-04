@@ -3,5 +3,5 @@ output "certificate_arn" {
 }
 
 output "domain_zone_id" {
-  value = var.create_route53_records ? data.aws_route53_zone.domain[0].zone_id : ""
+  value = data.aws_route53_zone.domain.zone_id
 }
