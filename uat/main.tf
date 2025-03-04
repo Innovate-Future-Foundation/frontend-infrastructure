@@ -21,7 +21,6 @@ module "cloudfront" {
   acm_certificate_arn = module.route53_acm.certificate_arn
   environment         = var.environment
   tags                = var.tags
-  use_acm_certificate = false
 }
 
 module "route53_acm" {

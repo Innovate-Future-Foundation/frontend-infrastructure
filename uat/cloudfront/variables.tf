@@ -21,16 +21,10 @@ variable "acm_certificate_arn" {
 variable "environment" {
   type        = string
   description = "Environment name (e.g., dev, prod)"
-  default     = "dev"
+  default     = "uat"
 }
 
 variable "tags" {
   type        = map(string)
   description = "Resource tags"
-}
-
-variable "use_acm_certificate" {
-  description = "Whether to use an ACM certificate"
-  type        = bool
-  default     = true
 }
