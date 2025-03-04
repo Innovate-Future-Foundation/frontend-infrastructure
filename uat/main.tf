@@ -34,5 +34,4 @@ module "route53_acm" {
   cloudfront_domain_name = module.cloudfront.distribution_domain_name
   cloudfront_zone_id     = module.cloudfront.distribution_hosted_zone_id
   tags                   = var.tags
-  create_route53_records = false
 }
