@@ -31,10 +31,10 @@ variable "tags" {
 
 variable "agw_id" {
   type        = string
-  description = "The Backend API Gateway id"
+  description = "The backend API Gateway id"
 }
 
 variable "agw_region" {
   type        = string
-  description = "The Backend API Gateway Region"
+  description = "The backend API Gateway Region"
 }
