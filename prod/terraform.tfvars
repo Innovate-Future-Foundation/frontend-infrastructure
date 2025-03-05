@@ -1,5 +1,5 @@
 region      = "ap-southeast-2"
 environment = "prod"
 bucket_name = "foundation-innovatefuture-prod-frontend-static"
-domain_name = "innovatefuture.foundation"
+domain_name = "saas.innovatefuture.foundation"
 agw_id      = "9tobwfaxuf"
