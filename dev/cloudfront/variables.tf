@@ -28,3 +28,13 @@ variable "tags" {
   type        = map(string)
   description = "Resource tags"
 }
+
+variable "agw_id" {
+  type        = string
+  description = "The backend API Gateway id"
+}
+
+variable "agw_region" {
+  type        = string
+  description = "The backend API Gateway Region"
+}
