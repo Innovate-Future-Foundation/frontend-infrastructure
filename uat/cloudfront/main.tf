@@ -1,3 +1,8 @@
+locals {
+  caching_disabled_policy              = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad"
+  all_viewer_excpet_host_header_policy = "b689b0a8-53d0-40ab-baf2-68738e2966ac"
+}
+
 data "aws_cloudfront_cache_policy" "optimized" {
   name = "Managed-CachingOptimized"
 }
@@ -34,6 +39,35 @@ resource "aws_cloudfront_distribution" "frontend" {
     response_headers_policy_id = data.aws_cloudfront_response_headers_policy.security_headers.id
     cache_policy_id            = data.aws_cloudfront_cache_policy.optimized.id
     compress                   = true
+  }
+
+  # Define the origin for the API Gateway
+  origin {
+    domain_name = "${var.agw_id}.execute-api.${var.agw_region}.amazonaws.com"
+    origin_id   = "apigw-origin"
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+    }
+  }
+
+  # Add cache behavior for the `/api/*` path
+  ordered_cache_behavior {
+    path_pattern     = "/api/*"
+    target_origin_id = "apigw-origin"
+
+    viewer_protocol_policy = "redirect-to-https"
+
+    allowed_methods = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods  = ["GET", "HEAD"]
+
+    cache_policy_id          = local.caching_disabled_policy
+    origin_request_policy_id = local.all_viewer_excpet_host_header_policy
+
+    compress = true
   }
 
   viewer_certificate {
