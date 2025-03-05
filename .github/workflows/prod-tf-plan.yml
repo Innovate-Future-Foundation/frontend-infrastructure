@@ -3,7 +3,7 @@ name: Production - Terraform Plan
 on:
   pull_request:
     branches:
-      - main
+      - dev
     paths:
       - "prod/**"
       - ".github/workflows/prod-tf-plan.yml"
