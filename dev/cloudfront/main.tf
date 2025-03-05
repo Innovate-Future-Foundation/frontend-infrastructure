@@ -68,20 +68,6 @@ resource "aws_cloudfront_distribution" "frontend" {
     origin_request_policy_id = local.all_viewer_excpet_host_header_policy
 
     compress = true
-
-    forwarded_values {
-      query_string = true
-
-      cookies {
-        forward = "all"
-      }
-
-      headers = ["Authorization"]
-    }
-
-    min_ttl     = 0
-    default_ttl = 0
-    max_ttl     = 0
   }
 
   viewer_certificate {
