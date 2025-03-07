@@ -1,12 +1,17 @@
+locals {
+  cf_aliases = concat([var.domain_name], var.alt_domain_names)
+}
+
 data "aws_route53_zone" "domain" {
   name         = var.domain_name
   private_zone = false
 }
 
 resource "aws_acm_certificate" "frontend" {
-  provider          = aws.us-east-1
-  domain_name       = var.domain_name
-  validation_method = "DNS"
+  provider                  = aws.us-east-1
+  domain_name               = var.domain_name
+  subject_alternative_names = var.alt_domain_names
+  validation_method         = "DNS"
 
   tags = merge(
     var.tags,
@@ -43,8 +48,10 @@ resource "aws_acm_certificate_validation" "frontend" {
 }
 
 resource "aws_route53_record" "frontend" {
+  for_each = toset(local.cf_aliases)
+
   zone_id = data.aws_route53_zone.domain.zone_id
-  name    = var.domain_name
+  name    = each.key
   type    = "A"
 
   alias {
