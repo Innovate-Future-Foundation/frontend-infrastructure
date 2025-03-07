@@ -82,7 +82,7 @@ resource "aws_cloudfront_distribution" "frontend" {
     }
   }
 
-  aliases = [var.domain_name]
+  aliases = var.domain_aliases
 
   custom_error_response {
     error_code         = 403

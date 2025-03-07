@@ -22,7 +22,7 @@ module "cloudfront" {
   environment         = var.environment
   agw_id              = var.agw_id
   agw_region          = "us-west-2"
-
+  domain_aliases      = concat([var.domain_name], var.alt_domain_names)
   tags                = var.tags
 }
 
@@ -33,6 +33,7 @@ module "route53_acm" {
   }
 
   domain_name            = var.domain_name
+  alt_domain_names       = var.alt_domain_names
   cloudfront_domain_name = module.cloudfront.distribution_domain_name
   cloudfront_zone_id     = module.cloudfront.distribution_hosted_zone_id
   tags                   = var.tags

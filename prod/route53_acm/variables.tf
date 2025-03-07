@@ -17,3 +17,9 @@ variable "tags" {
   type        = map(string)
   description = "Resource tags"
 }
+
+variable "alt_domain_names" {
+  type        = list(string)
+  description = "Alternative Domain Names for the certificate"
+  default     = []
+}

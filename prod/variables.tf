@@ -24,6 +24,11 @@ variable "domain_name" {
   }
 }
 
+variable "alt_domain_names" {
+  type        = list(string)
+  description = "Subject Alternative Domain name for the frontend application"
+}
+
 variable "tags" {
   type        = map(string)
   description = "Common tags for all resources"

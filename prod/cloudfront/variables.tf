@@ -38,3 +38,8 @@ variable "agw_region" {
   type        = string
   description = "The backend API Gateway Region"
 }
+
+variable "domain_aliases" {
+  type        = list(string)
+  description = "Domain alias"
+}
